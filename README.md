@@ -6,8 +6,8 @@ The workflow is like this:
 
 Export the photos from lightroom or your favourite program. Photo's metadata will be used for:
    - `Title` will be added to the post text.
-   - `Additional Info` will be added to the post text.
-   - `Event` will be used to group photos in the same post, all photos will be grouped by `Event` content (if it is not empty); you can put there any text you want, is only used for grouping.
+   - `Caption` will be added to the post text.
+   - `IPTC Subject Code` will be used to group photos in the same post, all photos will be grouped by `Event` content (if it is not empty); you can put there any text you want, is only used for grouping.
    - `Keywords` starting with `#` will be added to the post.
 1. Processor
    - Read all JPEG photos from configured `inputDirectory` directory.
