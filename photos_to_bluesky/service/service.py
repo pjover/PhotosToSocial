@@ -36,12 +36,17 @@ class Service:
     def run(self):
         stored_posts = self._storage.load()
         new_images = self._image_loader.read_new_images(stored_posts)
+        # TODO Images PereJover-X5000505.jpg and PereJover-X5000515-Pano.jpg are in the same post
+        #  the second filename is split in characters
+        #  {"images": ["/Users/pere/Pictures/BlueSky/PereJover-X5000505.jpg", "/", "U", "s", "e", "r", "s", "/", "p", "e", "r", "e", "/", "P", "i", "c", "t", "u", "r", "e", "s", "/", "B", "l", "u", "e", "S", "k", "y", "/", "P", "e", "r", "e", "J", "o", "v", "e", "r", "-", "X", "5", "0", "0", "0", "5", "1", "5", "-", "P", "a", "n", "o", ".", "j", "p", "g"], "text": ["Son Fortuny des del cam\u00ed reial de Puigpunyent.", "Son Fortuny entre oliveres, pins i falgueres."], "group": "241204SonFortuny", "keywords": ["#Estellencs", "#FujiFilm", "#Mallorca", "#OneDayOnePhoto", "#Photography", "#Panorama"], "processed_on": "2024-12-05T07:53:04.083064", "scheduled_on": ""}
+
+        # TODO sort posts by first filename and add an ULID to each post
         posts = self._group_images_into_posts(new_images)
         for post in posts:
             print(f"- {post}")
 
         # TODO: update stored posts
-        # self._store_posts(stored_posts + posts)
+        self._storage.store(stored_posts + posts)
 
     def _group_images_into_posts(self, images: List[Image]) -> List[Post]:
         grouped_images = defaultdict(list)

@@ -18,19 +18,34 @@ class ImageLoader:
         self._home_directory = home_directory
 
     def read_new_images(self, stored_posts: List[Post]) -> List[Image]:
-        # TODO return new image, not all images in directory
+        files = self._read_all_files()
         images = []
-        for root, dirs, files in os.walk(self._home_directory):
-            for file in files:
-                if file.lower().endswith(('.jpg', '.jpeg')):
-                    image_file = os.path.join(root, file)
-                    image = self._read(image_file)
-                    images.append(image)
+        for file in files:
+            if self._is_new_file(file, stored_posts):
+                images.append(self._read(file))
         return images
 
-    def _read(self, image_file: str) -> Image:
-        image = Image(path=image_file)
-        lines = self._command(["exiftool", "-XMP:all", image_file])
+    def _read_all_files(self) -> List[str]:
+        _files = []
+        for root, dirs, files in os.walk(self._home_directory):
+            _files = [os.path.join(root, x) for x in sorted(files) if x.lower().endswith(('.jpg', '.jpeg'))]
+            return _files
+
+    def _read_file(self, file: str, stored_posts: List[Post]) -> Image | None:
+        if self._is_new_file(file, stored_posts):
+            return self._read(file)
+        return None
+
+    @staticmethod
+    def _is_new_file(file: str, stored_posts: List[Post]) -> bool:
+        for post in stored_posts:
+            if file in post.images:
+                return False
+        return True
+
+    def _read(self, file: str) -> Image:
+        image = Image(path=file)
+        lines = self._command(["exiftool", "-XMP:all", file])
         for line in lines:
             self._extract_tag(line, image)
         return image
