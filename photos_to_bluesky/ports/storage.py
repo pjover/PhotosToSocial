@@ -8,6 +8,6 @@ class IStorage(Protocol):
         """Load stored posts and return them as a list."""
         ...
 
-    def store(self, images: List[Post]):
-        """Store the given list of posts."""
+    def store(self, stored_posts: List[Post], new_posts: List[Post]):
+        """Store the given lists of posts."""
         ...

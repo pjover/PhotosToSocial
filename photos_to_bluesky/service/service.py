@@ -36,17 +36,10 @@ class Service:
     def run(self):
         stored_posts = self._storage.load()
         new_images = self._image_loader.read_new_images(stored_posts)
-        # TODO Images PereJover-X5000505.jpg and PereJover-X5000515-Pano.jpg are in the same post
-        #  the second filename is split in characters
-        #  {"images": ["/Users/pere/Pictures/BlueSky/PereJover-X5000505.jpg", "/", "U", "s", "e", "r", "s", "/", "p", "e", "r", "e", "/", "P", "i", "c", "t", "u", "r", "e", "s", "/", "B", "l", "u", "e", "S", "k", "y", "/", "P", "e", "r", "e", "J", "o", "v", "e", "r", "-", "X", "5", "0", "0", "0", "5", "1", "5", "-", "P", "a", "n", "o", ".", "j", "p", "g"], "text": ["Son Fortuny des del cam\u00ed reial de Puigpunyent.", "Son Fortuny entre oliveres, pins i falgueres."], "group": "241204SonFortuny", "keywords": ["#Estellencs", "#FujiFilm", "#Mallorca", "#OneDayOnePhoto", "#Photography", "#Panorama"], "processed_on": "2024-12-05T07:53:04.083064", "scheduled_on": ""}
-
-        # TODO sort posts by first filename and add an ULID to each post
-        posts = self._group_images_into_posts(new_images)
-        for post in posts:
-            print(f"- {post}")
-
-        # TODO: update stored posts
-        self._storage.store(stored_posts + posts)
+        new_posts = self._group_images_into_posts(new_images)
+        for post in new_posts:
+            print(f" + {post}")
+        self._storage.store(stored_posts, new_posts)
 
     def _group_images_into_posts(self, images: List[Image]) -> List[Post]:
         grouped_images = defaultdict(list)
@@ -61,8 +54,8 @@ class Service:
             elif len(images) == 1:
                 posts.append(self._post_from_image(images[0]))
             else:
-                posts.append(self._merge_posts(images))
-        return posts
+                posts.append(self._merge(images))
+        return sorted(posts, key=lambda post: post.id)
 
     def _post_from_image(self, image: Image) -> Post:
         text = []
@@ -71,7 +64,8 @@ class Service:
             text.append(text_content)
 
         return Post(
-            images=[image.path],
+            id=image.id,
+            images=[image.file],
             text=text,
             group=image.group,
             keywords=image.keywords,
@@ -79,12 +73,12 @@ class Service:
             scheduled_on=""
         )
 
-    def _merge_posts(self, images: List[Image]) -> Post:
+    def _merge(self, images: List[Image]) -> Post:
         post = self._post_from_image(images[0])
         if post.text[0]:
             post.text[0] += "."
         for img in images[1:]:
-            post.images.extend(img.path)
+            post.images.append(img.file)
             text = self._build_text(img)
             if text:
                 post.text.append(text + ".")

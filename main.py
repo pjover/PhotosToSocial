@@ -1,6 +1,6 @@
 import os
 
-from photos_to_bluesky.adaptors.storage.json_file import JsonStorage
+from photos_to_bluesky.adaptors.storage.json_storage import JsonStorage
 from photos_to_bluesky.model.config import Config
 from photos_to_bluesky.ports.storage import IStorage
 from photos_to_bluesky.service.service import Service

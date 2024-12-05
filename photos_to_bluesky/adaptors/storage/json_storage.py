@@ -25,7 +25,8 @@ class JsonStorage(IStorage):
                 posts.append(Post(**data))
         return posts
 
-    def store(self, posts: List[Post]):
+    def store(self, stored_posts: List[Post], new_posts: List[Post]):
+        posts = sorted(stored_posts + new_posts, key=lambda post: post.id)
         with open(self._file_path, "w") as file:
             for post in posts:
                 json.dump(post.__dict__, file)

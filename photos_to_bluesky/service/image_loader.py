@@ -10,6 +10,7 @@ xmp_tags_to_store = {
     "Description": "caption",
     "Subject Code": "group",
     "Subject ": "keywords",
+    "Transmission Reference": "job_id",
 }
 
 
@@ -19,22 +20,19 @@ class ImageLoader:
 
     def read_new_images(self, stored_posts: List[Post]) -> List[Image]:
         files = self._read_all_files()
+        new_files = [file for file in files if self._is_new_file(file, stored_posts)]
         images = []
-        for file in files:
-            if self._is_new_file(file, stored_posts):
-                images.append(self._read(file))
+        index = 0
+        for file in new_files:
+            images.append(self._read(index, file))
+            index += 1
         return images
 
     def _read_all_files(self) -> List[str]:
         _files = []
         for root, dirs, files in os.walk(self._home_directory):
-            _files = [os.path.join(root, x) for x in sorted(files) if x.lower().endswith(('.jpg', '.jpeg'))]
+            _files = [x for x in sorted(files) if x.lower().endswith(('.jpg', '.jpeg'))]
             return _files
-
-    def _read_file(self, file: str, stored_posts: List[Post]) -> Image | None:
-        if self._is_new_file(file, stored_posts):
-            return self._read(file)
-        return None
 
     @staticmethod
     def _is_new_file(file: str, stored_posts: List[Post]) -> bool:
@@ -43,12 +41,18 @@ class ImageLoader:
                 return False
         return True
 
-    def _read(self, file: str) -> Image:
-        image = Image(path=file)
-        lines = self._command(["exiftool", "-XMP:all", file])
+    def _read(self, index: int, file: str) -> Image:
+        image = Image(index, file=file)
+        lines = self._command(["exiftool", "-XMP:all", os.path.join(self._home_directory, file)])
         for line in lines:
             self._extract_tag(line, image)
+        image.id = self._build_id(image, index)
         return image
+
+    @staticmethod
+    def _build_id(image: Image, index: int) -> int:
+        base = int(image.job_id.replace('JOB', ''))
+        return base * 10000 + index
 
     @staticmethod
     def _command(command) -> List[str]:
@@ -72,4 +76,6 @@ class ImageLoader:
                 image.caption = content
             elif field == "group":
                 image.group = content
+            elif field == "job_id":
+                image.job_id = content
         return image
