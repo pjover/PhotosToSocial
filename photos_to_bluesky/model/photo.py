@@ -10,6 +10,5 @@ class Photo(BaseModel):
     title: str = ""
     caption: str = ""
     keywords: List[str] = list()
-    job_id: str = ""
     width: int = 0
     height: int = 0
