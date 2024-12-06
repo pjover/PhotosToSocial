@@ -2,35 +2,37 @@ import os
 import subprocess
 from typing import List
 
-from photos_to_bluesky.model.image import Image
+from photos_to_bluesky.model.photo import Photo
 from photos_to_bluesky.model.post import Post
 
-xmp_tags_to_store = {
+tags_to_store = {
     "Title": "title",
     "Description": "caption",
     "Subject Code": "group",
     "Subject ": "keywords",
     "Transmission Reference": "job_id",
+    "Image Width": "width",
+    "Image Height": "height",
 }
 
 
-class ImageLoader:
+class PhotoLoader:
     def __init__(self, home_directory: str):
         self._home_directory = home_directory
 
-    def read_new_images(self, stored_posts: List[Post]) -> List[Image]:
+    def read_new_photos(self, stored_posts: List[Post]) -> List[Photo]:
         files = self._read_all_files()
         new_files = [file for file in files if self._is_new_file(file, stored_posts)]
-        images = []
+        photos = []
         index = 0
         for file in sorted(new_files):
-            images.append(self._read(index, file))
+            photos.append(self._read(index, file))
             index += 1
-        if images:
-            print(f"Found {len(images)} new images.")
+        if photos:
+            print(f"Found {len(photos)} new photos.")
         else:
-            print("No new images found.")
-        return images
+            print("No new photos found.")
+        return photos
 
     def _read_all_files(self) -> List[str]:
         _files = []
@@ -41,21 +43,24 @@ class ImageLoader:
     @staticmethod
     def _is_new_file(file: str, stored_posts: List[Post]) -> bool:
         for post in stored_posts:
-            if file in post.images:
+            post_images = [image.file for image in post.images]
+            if file in post_images:
                 return False
         return True
 
-    def _read(self, index: int, file: str) -> Image:
-        image = Image(index, file=file)
-        lines = self._command(["exiftool", "-XMP:all", os.path.join(self._home_directory, file)])
-        for line in lines:
-            self._extract_tag(line, image)
-        image.id = self._build_id(image, index)
-        return image
+    def _read(self, index: int, file: str) -> Photo:
+        photo = Photo(index, file=file)
+        xmp_lines = self._command(["exiftool", "-XMP:all", os.path.join(self._home_directory, file)])
+        file_lines = self._command(["exiftool", "-File:all", os.path.join(self._home_directory, file)])
+        for line in xmp_lines + file_lines:
+            self._extract_tag(line, photo)
+        photo.id = self._build_id(photo, index)
+        print(f"Read photo: {photo}")
+        return photo
 
     @staticmethod
-    def _build_id(image: Image, index: int) -> int:
-        base = int(image.job_id.replace('JOB', ''))
+    def _build_id(photo: Photo, index: int) -> int:
+        base = int(photo.job_id.replace('JOB', ''))
         return base * 10000 + index
 
     @staticmethod
@@ -67,19 +72,23 @@ class ImageLoader:
             raise RuntimeError(f"Error running command {command}: {result.stderr}")
 
     @staticmethod
-    def _extract_tag(line: str, image: Image) -> Image:
-        for tag, field in xmp_tags_to_store.items():
+    def _extract_tag(line: str, photo: Photo) -> Photo:
+        for tag, field in tags_to_store.items():
             if not line.startswith(tag):
                 continue
             content = line.split(":")[1].strip()
             if field == "keywords":
-                image.keywords = content.split(", ")
+                photo.keywords = content.split(", ")
             elif field == "title":
-                image.title = content
+                photo.title = content
             elif field == "caption":
-                image.caption = content
+                photo.caption = content
             elif field == "group":
-                image.group = content
+                photo.group = content
             elif field == "job_id":
-                image.job_id = content
-        return image
+                photo.job_id = content
+            elif field == "width":
+                photo.width = content
+            elif field == "height":
+                photo.height = content
+        return photo

@@ -3,10 +3,18 @@ from typing import List
 
 
 @dataclass
+class Image:
+    """Class for keeping track of an image from a post"""
+    file: str
+    width: int
+    height: int
+
+
+@dataclass
 class Post:
     """Class for keeping track of a post"""
     id: int
-    images: List[str]
+    images: List[Image]
     text: List[str]
     group: str
     keywords: List[str]
