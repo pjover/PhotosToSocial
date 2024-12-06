@@ -23,9 +23,13 @@ class ImageLoader:
         new_files = [file for file in files if self._is_new_file(file, stored_posts)]
         images = []
         index = 0
-        for file in new_files:
+        for file in sorted(new_files):
             images.append(self._read(index, file))
             index += 1
+        if images:
+            print(f"Found {len(images)} new images.")
+        else:
+            print("No new images found.")
         return images
 
     def _read_all_files(self) -> List[str]:
