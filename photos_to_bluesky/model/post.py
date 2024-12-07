@@ -6,6 +6,7 @@ from typing import List
 class Image:
     """Class for keeping track of an image from a post"""
     file: str
+    alt: str
     width: int
     height: int
 
@@ -19,7 +20,7 @@ class Post:
     group: str
     keywords: List[str]
     processed_on: str
-    scheduled_on: str
+    sent_on: str
 
     def __str__(self):
-        return f"{self.id}: {self.text}, {self.group}, {self.keywords}, {self.images}, {self.processed_on}, {self.scheduled_on}"
+        return f"{self.id}: {self.text}, {self.group}, {self.keywords}, {self.images}, {self.processed_on}, {self.sent_on}"

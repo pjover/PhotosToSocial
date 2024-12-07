@@ -40,8 +40,9 @@ class PostBuilder:
 
         image = Image(
             file=photo.file,
-            width=photo.width,
-            height=photo.height
+            alt=photo.title,
+            width=int(photo.width),
+            height=int(photo.height)
         )
 
         return Post(
@@ -51,7 +52,7 @@ class PostBuilder:
             group=photo.group,
             keywords=photo.keywords,
             processed_on=datetime.now().isoformat(),
-            scheduled_on=""
+            sent_on=""
         )
 
     def _merge(self, photos: List[Photo]) -> Post:
@@ -61,6 +62,7 @@ class PostBuilder:
         for photo in photos[1:]:
             image = Image(
                 file=photo.file,
+                alt=photo.title,
                 width=photo.width,
                 height=photo.height
             )

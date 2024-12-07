@@ -78,7 +78,7 @@ class PhotoLoader:
                 continue
             content = line.split(":")[1].strip()
             if field == "keywords":
-                photo.keywords = content.split(", ")
+                photo.keywords = content.replace("#", "").split(", ")
             elif field == "title":
                 photo.title = content
             elif field == "caption":
