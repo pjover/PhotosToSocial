@@ -1,6 +1,7 @@
 import argparse
 import os
 
+from photos_to_bluesky.adaptors.social.blue_sky import BlueSky
 from photos_to_bluesky.adaptors.social.word_press import WordPress
 from photos_to_bluesky.adaptors.storage.json_storage import JsonStorage
 from photos_to_bluesky.model.config import Config
@@ -8,14 +9,14 @@ from photos_to_bluesky.ports.istorage import IStorage
 from photos_to_bluesky.service.loader_service import LoaderService
 from photos_to_bluesky.service.post_service import PostService
 
+POSTS_FILENAME = "posts.jsonl"
+
 HOME_ENV = "PHOTOS_TO_SOCIAL_HOME"
 BLUE_SKY_USERNAME_ENV = "BLUE_SKY_USERNAME"
 BLUE_SKY_PASSWORD_ENV = "BLUE_SKY_PASSWORD"
-WORD_PRESS_POST_BY_EMAIL_FROM_ENV = "WORD_PRESS_POST_BY_EMAIL_FROM"
+GMAIL_ACCOUNT_ENV = "GMAIL_ACCOUNT"
+GMAIL_APP_PASSWORD_ENV = "GMAIL_APP_PASSWORD"
 WORD_PRESS_POST_BY_EMAIL_TO_ENV = "WORD_PRESS_POST_BY_EMAIL_TO"
-WORD_PRESS_POST_BY_EMAIL_CREDENTIALS_FILENAME = "credentials.json"
-WORD_PRESS_POST_BY_EMAIL_TOKEN_FILENAME = "token.json"
-POSTS_FILENAME = "posts.jsonl"
 
 
 def _check_directory(directory: str) -> str:
@@ -31,10 +32,9 @@ def _load_config() -> Config:
         posts_file=os.path.join(home_directory, POSTS_FILENAME),
         blue_sky_username=os.getenv(BLUE_SKY_USERNAME_ENV),
         blue_sky_password=os.getenv(BLUE_SKY_PASSWORD_ENV),
-        word_press_post_by_email_from=os.getenv(WORD_PRESS_POST_BY_EMAIL_FROM_ENV),
+        gmail_account=os.getenv(GMAIL_ACCOUNT_ENV),
+        gmail_app_password=os.getenv(GMAIL_APP_PASSWORD_ENV),
         word_press_post_by_email_to=os.getenv(WORD_PRESS_POST_BY_EMAIL_TO_ENV),
-        word_press_post_by_email_credentials_filename=WORD_PRESS_POST_BY_EMAIL_CREDENTIALS_FILENAME,
-        word_press_post_by_email_token_filename=WORD_PRESS_POST_BY_EMAIL_TOKEN_FILENAME,
     )
 
 
@@ -56,10 +56,16 @@ if __name__ == "__main__":
     config = _load_config()
     storage: IStorage = JsonStorage(config)
     if args.load:
-        LoaderService(config, storage).run()
+        LoaderService(
+            config,
+            storage,
+        ).run()
     elif args.post:
-        social_media = [
-            # BlueSky(config),
-            WordPress(config),
-        ]
-        PostService(config, storage, social_media).run()
+        PostService(
+            config,
+            storage,
+            [
+                BlueSky(config),
+                WordPress(config),
+            ],
+        ).run()
