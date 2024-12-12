@@ -1,17 +1,20 @@
 import argparse
 import os
 
-from photos_to_bluesky.adaptors.social.blue_sky import BlueSky
+from photos_to_bluesky.adaptors.social.word_press import WordPress
 from photos_to_bluesky.adaptors.storage.json_storage import JsonStorage
 from photos_to_bluesky.model.config import Config
-from photos_to_bluesky.ports.isocialmedia import ISocialMedia
 from photos_to_bluesky.ports.istorage import IStorage
 from photos_to_bluesky.service.loader_service import LoaderService
 from photos_to_bluesky.service.post_service import PostService
 
-HOME_ENV = "PhotosToBlueSkyHome"
-BLUE_SKY_HANDLE_ENV = "BlueSkyHandle"
-BLUE_SKY_PASSWORD_ENV = "BlueSkyPassword"
+HOME_ENV = "PHOTOS_TO_SOCIAL_HOME"
+BLUE_SKY_USERNAME_ENV = "BLUE_SKY_USERNAME"
+BLUE_SKY_PASSWORD_ENV = "BLUE_SKY_PASSWORD"
+WORD_PRESS_POST_BY_EMAIL_FROM_ENV = "WORD_PRESS_POST_BY_EMAIL_FROM"
+WORD_PRESS_POST_BY_EMAIL_TO_ENV = "WORD_PRESS_POST_BY_EMAIL_TO"
+WORD_PRESS_POST_BY_EMAIL_CREDENTIALS_FILENAME = "credentials.json"
+WORD_PRESS_POST_BY_EMAIL_TOKEN_FILENAME = "token.json"
 POSTS_FILENAME = "posts.jsonl"
 
 
@@ -24,10 +27,14 @@ def _check_directory(directory: str) -> str:
 def _load_config() -> Config:
     home_directory = _check_directory(os.getenv(HOME_ENV))
     return Config(
-        home_directory,
-        os.path.join(home_directory, POSTS_FILENAME),
-        os.getenv(BLUE_SKY_HANDLE_ENV),
-        os.getenv(BLUE_SKY_PASSWORD_ENV)
+        home_directory=home_directory,
+        posts_file=os.path.join(home_directory, POSTS_FILENAME),
+        blue_sky_username=os.getenv(BLUE_SKY_USERNAME_ENV),
+        blue_sky_password=os.getenv(BLUE_SKY_PASSWORD_ENV),
+        word_press_post_by_email_from=os.getenv(WORD_PRESS_POST_BY_EMAIL_FROM_ENV),
+        word_press_post_by_email_to=os.getenv(WORD_PRESS_POST_BY_EMAIL_TO_ENV),
+        word_press_post_by_email_credentials_filename=WORD_PRESS_POST_BY_EMAIL_CREDENTIALS_FILENAME,
+        word_press_post_by_email_token_filename=WORD_PRESS_POST_BY_EMAIL_TOKEN_FILENAME,
     )
 
 
@@ -51,5 +58,8 @@ if __name__ == "__main__":
     if args.load:
         LoaderService(config, storage).run()
     elif args.post:
-        social_media: ISocialMedia = BlueSky(config)
+        social_media = [
+            # BlueSky(config),
+            WordPress(config),
+        ]
         PostService(config, storage, social_media).run()

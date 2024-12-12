@@ -16,7 +16,8 @@ class Post:
     """Class for keeping track of a post"""
     id: int
     images: List[Image]
-    text: List[str]
+    title: str
+    text: str
     group: str
     keywords: List[str]
     processed_on: str

@@ -32,11 +32,8 @@ class PostBuilder:
                 print(f" - {post}")
         return posts
 
-    def _post_from_photo(self, photo: Photo) -> Post:
-        text = []
-        text_content = self._build_text(photo)
-        if text_content:
-            text.append(text_content)
+    @staticmethod
+    def _post_from_photo(photo: Photo) -> Post:
 
         image = Image(
             file=photo.file,
@@ -48,7 +45,8 @@ class PostBuilder:
         return Post(
             id=photo.id,
             images=[image],
-            text=text,
+            title=photo.title,
+            text=photo.caption,
             group=photo.group,
             keywords=photo.keywords,
             processed_on=datetime.now().isoformat(),
@@ -72,17 +70,6 @@ class PostBuilder:
                 post.text.append(text + ".")
             post.keywords = self._unique_keywords(post.keywords, photo.keywords)
         return post
-
-    @staticmethod
-    def _build_text(photo: Photo) -> str:
-        if photo.title and photo.caption:
-            return f"{photo.title}. {photo.caption}."
-        elif photo.title:
-            return photo.title
-        elif photo.caption:
-            return photo.caption
-        else:
-            return ""
 
     @staticmethod
     def _unique_keywords(keywords_left: List[str], keywords_right: List[str]) -> List[str]:

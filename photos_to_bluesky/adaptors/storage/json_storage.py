@@ -15,7 +15,8 @@ class JsonStorage(IStorage):
     @staticmethod
     def _check_file(file_path: str) -> str:
         if not os.path.isfile(file_path):
-            raise RuntimeError(f"Error: '{file_path}' is not a valid file.")
+            open(file_path, 'a').close()
+            print(f"File '{file_path}' did not exist and was created.")
         return file_path
 
     def read_all_posts(self) -> List[Post]:

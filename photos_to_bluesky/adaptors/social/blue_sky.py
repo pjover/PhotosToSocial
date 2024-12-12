@@ -13,9 +13,10 @@ class BlueSky(ISocialMedia):
     def __init__(self, config: Config):
         self._home_directory = config.home_directory
         self._client = Client()
-        self._client.login(config.blue_sky_handle, config.blue_sky_password)
+        self._client.login(config.blue_sky_username, config.blue_sky_password)
 
     def publish_post(self, post: Post):
+        print(f"Publishing post `{post.id}` to BlueSky ...")
         paths = [os.path.join(self._home_directory, img.file) for img in post.images]
         image_alts = [img.alt for img in post.images]
         image_aspect_ratios = [self._aspect_ratio(height=img.height, width=img.width) for img in post.images]
@@ -25,8 +26,7 @@ class BlueSky(ISocialMedia):
             with open(path, 'rb') as f:
                 images.append(f.read())
 
-        text = "\n".join(post.text)
-        text += "\n\n"
+        text = f"{post.title}\n\n{post.text}"
         text_builder = client_utils.TextBuilder()
         text_builder.text(text)
 

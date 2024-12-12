@@ -54,6 +54,9 @@ class PhotoLoader:
         file_lines = self._command(["exiftool", "-File:all", os.path.join(self._home_directory, file)])
         for line in xmp_lines + file_lines:
             self._extract_tag(line, photo)
+        if not photo.title:
+            raise RuntimeError(f"Title not found for photo {photo.file}")
+
         photo.id = self._build_id(photo, index)
         print(f"Read photo: {photo}")
         return photo
