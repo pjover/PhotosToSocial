@@ -21,7 +21,7 @@ STATUS = "publish"
 class WordPress(ISocialMedia):
     def __init__(self, config: Config):
         self._home_directory = config.home_directory
-        self._gmail_account = config.gmail_account
+        self._gmail_account = config.gmail_user_email
         self._gmail_app_password = config.gmail_app_password
         self._to = config.word_press_post_by_email_to
 

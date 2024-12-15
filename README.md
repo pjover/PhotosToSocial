@@ -1,43 +1,37 @@
-# PhotosToBuffer
+# PhotosToSocial
 
-PhotosToBuffer is a tool to publish post with photos into [Buffer](https://buffer.com). The goal is to be able to post at least a photo every day without effort.
+PhotosToSocial is a python script to publish post with photos into social media (WordPress and BluSky by now). The goal
+is to be able to post at least a photo every day without effort.
 
 The workflow is like this:
 
-Export the photos from lightroom or your favourite program. Photo's metadata will be used for:
-   - `Title` will be added to the post text.
-   - `Caption` will be added to the post text.
-   - `IPTC Subject Code` will be used to group photos in the same post, all photos will be grouped by `Event` content (if it is not empty); you can put there any text you want, is only used for grouping.
-   - `Keywords` starting with `#` will be added to the post.
-1. Processor
-   - Read all JPEG photos from configured `inputDirectory` directory.
-   - Read already processed photos from storage.
-   - Identify the new photo files to be processed.
-   - Extract metadata into `Image` object:
-     - `caption` with `Caption` tag content
-     - `additional_info` with `Additional Info` tag content
-     - `event` with `Event` tag content
-     - `keywords[]` with all `Keywords` starting with `#`
-   - Remove all metadata from the photos except:
-       - `Caption`
-       - `Additional Info`
-       - `Event`
-       - `Keywords` starting with `#`
-       - `Creator`
-       - `Copyright`
-       - `Copyright Status`
-       - `Rights Usage Terms`
-       - `Copyright Info URL`
-       - `E.Mail`
-   - Update the photo files with updated metadata into configured `outputDirectory` directory.
-   - Store the metadata (`caption`, `additional_info`, `event`, `keywords[]`) and when the file was processed into storage (`processed=now()`, `scheduled=null`).
-2. Scheduler
-   - Read not scheduled photos (`scheduled=null`) from storage.
-   - Identify images to be published.
-   - Group photos by `event` field
-   - Set publishing date.
-   - Schedule a batch for every `event` into every configured Buffer channel `channels[]`, keeping the max scheduled posts under the free tier limit (10 per channel).
-   - Store the scheduled photos (`scheduled=now()`) info in storage.
+1. Export the photos from lightroom or your favourite program into `PHOTOS_TO_SOCIAL_HOME` directory.
+2. Load (running `main.py --load`) loads photos from home directory and prepare posts.
+    1. `PhotoLoader` will load new photos and read metadata. This process will load new photos, comparing with posts
+       already loaded ans stored into `POSTS_FILENAME` json file.
+    2. `PostBuilder` creates post from photos
+        - Metadata:
+            - `Title` will be added to the post text. If multiple photos in the same job share the same `title`, then it
+              will merged in a single post with all photos.
+            - `Caption` will be added to the post text. If multiple photos are grouped in the same post, the `caption`
+              field will be used for the post text, appending the caption of every photo to the post's text, and
+              as `alt` text of the image (if it has content).
+            - `Keywords` starting with `#` will be added to the post. If multiple photos are grouped in the same post,
+              duplicated keywords are ignored.
+        - The posts are stored into `POSTS_FILENAME` json file.
+3. Post (running `main.py --post`) sends next post to Social media. This option is intendet to be called by a daily cron
+   job.
+    1. Reads next post to be published from `POSTS_FILENAME` json file.
+    2. Send the post to social media, currently to BlueSky and WordPress (using Post by Email feature).
+    3. Updates the post at `POSTS_FILENAME` json file.
 
-We will store an read from database to be able to keep track of the state of every photo, and run the entire process even if there are no new photos, but som of them can be scheduled and published. The database is implemented with SQLite.
+## Configuration
 
+Set these environment variables to set up the script:
+
+- `PHOTOS_TO_SOCIAL_HOME`: Home directory were photos and `POSTS_FILENAME` json file are stored.
+- `BLUE_SKY_USERNAME`: Your BlueSky username.
+- `BLUE_SKY_PASSWORD`: Your BlueSky password.
+- `GMAIL_USER_EMAIL`: Your gmail email.
+- `GMAIL_APP_PASSWORD`: An gmail app password.
+- `WORD_PRESS_POST_BY_EMAIL_TO`: the recipient address configured for WordPress Post by Email.

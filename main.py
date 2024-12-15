@@ -11,13 +11,6 @@ from photos_to_bluesky.service.post_service import PostService
 
 POSTS_FILENAME = "posts.jsonl"
 
-HOME_ENV = "PHOTOS_TO_SOCIAL_HOME"
-BLUE_SKY_USERNAME_ENV = "BLUE_SKY_USERNAME"
-BLUE_SKY_PASSWORD_ENV = "BLUE_SKY_PASSWORD"
-GMAIL_ACCOUNT_ENV = "GMAIL_ACCOUNT"
-GMAIL_APP_PASSWORD_ENV = "GMAIL_APP_PASSWORD"
-WORD_PRESS_POST_BY_EMAIL_TO_ENV = "WORD_PRESS_POST_BY_EMAIL_TO"
-
 
 def _check_directory(directory: str) -> str:
     if not os.path.isdir(directory):
@@ -26,15 +19,15 @@ def _check_directory(directory: str) -> str:
 
 
 def _load_config() -> Config:
-    home_directory = _check_directory(os.getenv(HOME_ENV))
+    home_directory = _check_directory(os.getenv("PHOTOS_TO_SOCIAL_HOME"))
     return Config(
         home_directory=home_directory,
         posts_file=os.path.join(home_directory, POSTS_FILENAME),
-        blue_sky_username=os.getenv(BLUE_SKY_USERNAME_ENV),
-        blue_sky_password=os.getenv(BLUE_SKY_PASSWORD_ENV),
-        gmail_account=os.getenv(GMAIL_ACCOUNT_ENV),
-        gmail_app_password=os.getenv(GMAIL_APP_PASSWORD_ENV),
-        word_press_post_by_email_to=os.getenv(WORD_PRESS_POST_BY_EMAIL_TO_ENV),
+        blue_sky_username=os.getenv("BLUE_SKY_USERNAME"),
+        blue_sky_password=os.getenv("BLUE_SKY_PASSWORD"),
+        gmail_user_email=os.getenv("GMAIL_USER_EMAIL"),
+        gmail_app_password=os.getenv("GMAIL_APP_PASSWORD"),
+        word_press_post_by_email_to=os.getenv("WORD_PRESS_POST_BY_EMAIL_TO"),
     )
 
 
@@ -46,7 +39,7 @@ def _load_args():
     )
     group = parser.add_mutually_exclusive_group(required=True)
     group.add_argument("-l", "--load", action="store_true", help="Load photos from home directory and prepare posts.")
-    group.add_argument("-p", "--post", action="store_true", help="Send next post to BlueSky.")
+    group.add_argument("-p", "--post", action="store_true", help="Send next post to Social media.")
 
     return parser.parse_args()
 

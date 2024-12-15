@@ -1,18 +1,15 @@
-from dataclasses import dataclass
 from typing import List
 
-NO_GROUP = "NO_GROUP"
+from pydantic import BaseModel
 
 
-@dataclass
-class Photo:
-    """Class for keeping track of an photo read from a file"""
-    id: id
+class Photo(BaseModel):
+    """Class for keeping track of a photo read from a file"""
+    id: int
     file: str
     title: str = ""
     caption: str = ""
-    group: str = NO_GROUP
-    keywords: List[str] = list
+    keywords: List[str] = list()
     job_id: str = ""
     width: int = 0
     height: int = 0

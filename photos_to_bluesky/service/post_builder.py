@@ -2,7 +2,7 @@ from collections import defaultdict
 from datetime import datetime
 from typing import List
 
-from photos_to_bluesky.model.photo import Photo, NO_GROUP
+from photos_to_bluesky.model.photo import Photo
 from photos_to_bluesky.model.post import Post, Image
 
 
@@ -11,19 +11,16 @@ class PostBuilder:
     def group_photos_into_posts(self, photos: List[Photo]) -> List[Post]:
         grouped_photos = defaultdict(list)
         for photo in photos:
-            grouped_photos[photo.group].append(photo)
+            grouped_photos[photo.title].append(photo)
 
         posts = []
-        for group, photos in grouped_photos.items():
-            if group == NO_GROUP:
-                for photo in photos:
-                    posts.append(self._post_from_photo(photo))
-            elif len(photos) == 1:
+        for title, photos in grouped_photos.items():
+            if len(photos) == 1:
                 posts.append(self._post_from_photo(photos[0]))
             else:
                 posts.append(self._merge(photos))
 
-        posts = sorted(posts, key=lambda post: post.id)
+        posts = sorted(posts, key=lambda x: x.id)
         if not posts:
             print("No new posts.")
         else:
@@ -32,43 +29,45 @@ class PostBuilder:
                 print(f" - {post}")
         return posts
 
-    @staticmethod
-    def _post_from_photo(photo: Photo) -> Post:
-
-        image = Image(
-            file=photo.file,
-            alt=photo.title,
-            width=int(photo.width),
-            height=int(photo.height)
-        )
-
+    def _post_from_photo(self, photo: Photo) -> Post:
         return Post(
             id=photo.id,
-            images=[image],
+            images=[self._image(photo)],
             title=photo.title,
             text=photo.caption,
-            group=photo.group,
             keywords=photo.keywords,
             processed_on=datetime.now().isoformat(),
             sent_on=""
         )
 
+    @staticmethod
+    def _image(photo: Photo) -> Image:
+        return Image(
+            file=photo.file,
+            alt=photo.caption if photo.caption else photo.title,
+            width=photo.width,
+            height=photo.height
+        )
+
     def _merge(self, photos: List[Photo]) -> Post:
+        # The post is built from the first photo
         post = self._post_from_photo(photos[0])
-        if post.text[0]:
-            post.text[0] += "."
+
+        text = []
+        if post.text:
+            text.append(post.text)
+
         for photo in photos[1:]:
-            image = Image(
-                file=photo.file,
-                alt=photo.title,
-                width=photo.width,
-                height=photo.height
-            )
-            post.images.append(image)
-            text = self._build_text(photo)
-            if text:
-                post.text.append(text + ".")
+            # Add image
+            post.images.append(self._image(photo))
+            # Merge keywords
             post.keywords = self._unique_keywords(post.keywords, photo.keywords)
+            # Merge text
+            if photo.caption:
+                text.append(photo.caption)
+
+        if text:
+            post.text = ".\n".join(text)
         return post
 
     @staticmethod

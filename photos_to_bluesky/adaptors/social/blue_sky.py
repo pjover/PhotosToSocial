@@ -12,8 +12,16 @@ from photos_to_bluesky.ports.isocialmedia import ISocialMedia
 class BlueSky(ISocialMedia):
     def __init__(self, config: Config):
         self._home_directory = config.home_directory
-        self._client = Client()
-        self._client.login(config.blue_sky_username, config.blue_sky_password)
+        self._client = self._client(config.blue_sky_username, config.blue_sky_password)
+
+    @staticmethod
+    def _client(username: str, password: str):
+        try:
+            _client = Client()
+            _client.login(username, password)
+            return _client
+        except Exception as e:
+            raise RuntimeError(f"Failed to login to BlueSky: {e}")
 
     def publish_post(self, post: Post):
         print(f"Publishing post `{post.id}` to BlueSky ...")

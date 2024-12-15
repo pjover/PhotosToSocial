@@ -1,8 +1,6 @@
 import os
 from typing import List
 
-import jsonpickle
-
 from photos_to_bluesky.model.config import Config
 from photos_to_bluesky.model.post import Post
 from photos_to_bluesky.ports.istorage import IStorage
@@ -23,8 +21,11 @@ class JsonStorage(IStorage):
         posts = []
         with open(self._file_path, "r") as file:
             for line in file:
-                data = jsonpickle.decode(line)
-                posts.append(data)
+                _line = line.strip()
+                if not _line:
+                    continue
+                post = Post.model_validate_json(_line)
+                posts.append(post)
         return posts
 
     def read_next_post(self) -> Post | None:
@@ -46,5 +47,5 @@ class JsonStorage(IStorage):
         posts = sorted(stored_posts + new_posts, key=lambda post: post.id)
         with open(self._file_path, "w") as file:
             for post in posts:
-                line = jsonpickle.encode(post)
+                line = post.model_dump_json()
                 file.write(f"{line}\n")

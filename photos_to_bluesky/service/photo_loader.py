@@ -8,7 +8,6 @@ from photos_to_bluesky.model.post import Post
 tags_to_store = {
     "Title": "title",
     "Description": "caption",
-    "Subject Code": "group",
     "Subject ": "keywords",
     "Transmission Reference": "job_id",
     "Image Width": "width",
@@ -49,7 +48,7 @@ class PhotoLoader:
         return True
 
     def _read(self, index: int, file: str) -> Photo:
-        photo = Photo(index, file=file)
+        photo = Photo(id=index, file=file)
         xmp_lines = self._command(["exiftool", "-XMP:all", os.path.join(self._home_directory, file)])
         file_lines = self._command(["exiftool", "-File:all", os.path.join(self._home_directory, file)])
         for line in xmp_lines + file_lines:
@@ -86,8 +85,6 @@ class PhotoLoader:
                 photo.title = content
             elif field == "caption":
                 photo.caption = content
-            elif field == "group":
-                photo.group = content
             elif field == "job_id":
                 photo.job_id = content
             elif field == "width":

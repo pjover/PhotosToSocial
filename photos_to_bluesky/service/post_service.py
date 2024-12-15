@@ -21,4 +21,4 @@ class PostService:
         for social_media in self._social_media:
             social_media.publish_post(next_post)
         next_post.sent_on = datetime.now().isoformat()
-        # self._storage.update(next_post)
+        self._storage.update(next_post)
