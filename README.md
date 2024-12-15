@@ -35,3 +35,15 @@ Set these environment variables to set up the script:
 - `GMAIL_USER_EMAIL`: Your gmail email.
 - `GMAIL_APP_PASSWORD`: An gmail app password.
 - `WORD_PRESS_POST_BY_EMAIL_TO`: the recipient address configured for WordPress Post by Email.
+
+## Install
+
+## Python env
+
+1. Create the virtual environment: `python -m venv .venv`
+2. Activate the virtual environment: `source .venv/bin/activate`
+3. Install dependencies: `pip3 install -r requirements.txt`
+
+## ExifTool
+
+Follow the instructions on [ExifTool installation page](https://exiftool.org/install.html).

@@ -1,5 +1,5 @@
 import os
-from typing import List
+from typing import List, Optional
 
 from photos_to_bluesky.model.config import Config
 from photos_to_bluesky.model.post import Post
@@ -28,7 +28,7 @@ class JsonStorage(IStorage):
                 posts.append(post)
         return posts
 
-    def read_next_post(self) -> Post | None:
+    def read_next_post(self) -> Optional[Post]:
         all_posts = self.read_all_posts()
         if not all_posts:
             return None
