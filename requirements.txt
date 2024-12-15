@@ -1,5 +1,3 @@
 piexif
 pillow
 atproto
-smtplib
-pytest
