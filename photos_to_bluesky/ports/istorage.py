@@ -1,4 +1,4 @@
-from typing import List, Protocol
+from typing import List, Protocol, Optional
 
 from photos_to_bluesky.model.post import Post
 
@@ -8,7 +8,7 @@ class IStorage(Protocol):
         """Load all stored posts and return them as a list."""
         ...
 
-    def read_next_post(self) -> Post | None:
+    def read_next_post(self) -> Optional[Post]:
         """Load the next post to be published."""
         ...
 
