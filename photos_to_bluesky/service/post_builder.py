@@ -1,3 +1,4 @@
+import logging
 from collections import defaultdict
 from datetime import datetime
 from typing import List
@@ -22,11 +23,11 @@ class PostBuilder:
 
         posts = sorted(posts, key=lambda x: x.id)
         if not posts:
-            print("No new posts.")
+            logging.info("No new posts.")
         else:
-            print(f"Found {len(posts)} new posts:")
+            logging.info(f"Found {len(posts)} new posts:")
             for post in posts:
-                print(f" - {post}")
+                logging.info(f" - {post}")
         return posts
 
     def _post_from_photo(self, photo: Photo) -> Post:

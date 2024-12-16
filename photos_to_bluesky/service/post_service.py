@@ -1,3 +1,4 @@
+import logging
 import typing
 from datetime import datetime
 
@@ -15,9 +16,9 @@ class PostService:
     def run(self):
         next_post = self._storage.read_next_post()
         if not next_post:
-            print("No posts to publish.")
+            logging.info("No posts to publish.")
             return
-        print(f"Publishing post: {next_post}")
+        logging.info(f"Publishing post: {next_post}")
         for social_media in self._social_media:
             social_media.publish_post(next_post)
         next_post.sent_on = datetime.now().isoformat()

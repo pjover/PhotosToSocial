@@ -1,3 +1,4 @@
+import logging
 import os
 import subprocess
 from typing import List
@@ -28,9 +29,9 @@ class PhotoLoader:
             photos.append(self._read(index, file))
             index += 1
         if photos:
-            print(f"Found {len(photos)} new photos.")
+            logging.info(f"Found {len(photos)} new photos.")
         else:
-            print("No new photos found.")
+            logging.info("No new photos found.")
         return photos
 
     def _read_all_files(self) -> List[str]:
@@ -57,7 +58,7 @@ class PhotoLoader:
             raise RuntimeError(f"Title not found for photo {photo.file}")
 
         photo.id = self._build_id(photo, index)
-        print(f"Read photo: {photo}")
+        logging.info(f"Read photo: {photo}")
         return photo
 
     @staticmethod

@@ -1,5 +1,8 @@
 import argparse
+import logging
 import os
+import sys
+from logging.handlers import RotatingFileHandler
 
 from photos_to_bluesky.adaptors.social.blue_sky import BlueSky
 from photos_to_bluesky.adaptors.social.word_press import WordPress
@@ -10,6 +13,8 @@ from photos_to_bluesky.service.loader_service import LoaderService
 from photos_to_bluesky.service.post_service import PostService
 
 POSTS_FILENAME = "posts.jsonl"
+LOG_FILENAME = "photos_to_social.log"
+MAX_LOG_SIZE = 1024 * 512
 
 
 def _check_directory(directory: str) -> str:
@@ -44,9 +49,22 @@ def _load_args():
     return parser.parse_args()
 
 
+def _init_logging(level, home_directory):
+    _file = os.path.join(home_directory, LOG_FILENAME)
+    logging.basicConfig(
+        level=level,
+        format="%(asctime)s [%(levelname)s] %(message)s",
+        handlers=[
+            RotatingFileHandler(filename=_file, maxBytes=MAX_LOG_SIZE, backupCount=5),
+            logging.StreamHandler(sys.stdout)
+        ]
+    )
+
+
 if __name__ == "__main__":
     args = _load_args()
     config = _load_config()
+    _init_logging(logging.INFO, config.home_directory)
     storage: IStorage = JsonStorage(config)
     if args.load:
         LoaderService(

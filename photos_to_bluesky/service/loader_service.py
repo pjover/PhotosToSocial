@@ -1,3 +1,5 @@
+import logging
+
 from photos_to_bluesky.model.config import Config
 from photos_to_bluesky.ports.istorage import IStorage
 from photos_to_bluesky.service.photo_loader import PhotoLoader
@@ -20,7 +22,7 @@ class LoaderService:
         self._storage = storage
         self._photo_loader = PhotoLoader(self._home_directory)
         self._post_builder = PostBuilder()
-        print(f"Loading photos from directory: `{self._home_directory}`")
+        logging.info(f"Loading photos from directory: `{self._home_directory}`")
 
     def run(self):
         all_posts = self._storage.read_all_posts()

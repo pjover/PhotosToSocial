@@ -1,3 +1,4 @@
+import logging
 import os.path
 from math import gcd
 
@@ -24,7 +25,7 @@ class BlueSky(ISocialMedia):
             raise RuntimeError(f"Failed to login to BlueSky: {e}")
 
     def publish_post(self, post: Post):
-        print(f"Publishing post `{post.id}` to BlueSky ...")
+        logging.info(f"Publishing post `{post.id}` to BlueSky ...")
         paths = [os.path.join(self._home_directory, img.file) for img in post.images]
         image_alts = [img.alt for img in post.images]
         image_aspect_ratios = [self._aspect_ratio(height=img.height, width=img.width) for img in post.images]
