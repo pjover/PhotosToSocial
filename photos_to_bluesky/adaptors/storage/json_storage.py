@@ -1,3 +1,4 @@
+import logging
 import os
 from typing import List, Optional
 
@@ -14,7 +15,7 @@ class JsonStorage(IStorage):
     def _check_file(file_path: str) -> str:
         if not os.path.isfile(file_path):
             open(file_path, 'a').close()
-            print(f"File '{file_path}' did not exist and was created.")
+            logging.info(f"File '{file_path}' did not exist and was created.")
         return file_path
 
     def read_all_posts(self) -> List[Post]:
