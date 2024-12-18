@@ -62,16 +62,20 @@ def _init_logging(level, home_directory):
 
 
 if __name__ == "__main__":
+    logging.info("Setting up PhotosToSocial ...")
     args = _load_args()
     config = _load_config()
     _init_logging(logging.INFO, config.home_directory)
+    logging.info(f"Loaded config: {config}")
     storage: IStorage = JsonStorage(config)
     if args.load:
+        logging.info(f"Loading new posts from {config.home_directory} ...")
         LoaderService(
             config,
             storage,
         ).run()
     elif args.post:
+        logging.info("Sending one post to social media ...")
         PostService(
             config,
             storage,
