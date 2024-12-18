@@ -4,13 +4,9 @@ import os
 import sys
 from logging.handlers import RotatingFileHandler
 
-from photos_to_bluesky.adaptors.social.blue_sky import BlueSky
-from photos_to_bluesky.adaptors.social.word_press import WordPress
 from photos_to_bluesky.adaptors.storage.json_storage import JsonStorage
 from photos_to_bluesky.model.config import Config
 from photos_to_bluesky.ports.istorage import IStorage
-from photos_to_bluesky.service.loader_service import LoaderService
-from photos_to_bluesky.service.post_service import PostService
 
 POSTS_FILENAME = "posts.jsonl"
 LOG_FILENAME = "photos_to_social.log"
@@ -62,21 +58,25 @@ def _init_logging(level, home_directory):
 
 
 if __name__ == "__main__":
+    logging.info("Setting up PhotosToSocial ...")
     args = _load_args()
     config = _load_config()
     _init_logging(logging.INFO, config.home_directory)
+    logging.info(f"Loaded config: {config}")
     storage: IStorage = JsonStorage(config)
     if args.load:
-        LoaderService(
-            config,
-            storage,
-        ).run()
+        logging.info(f"Loading new posts from {config.home_directory} ...")
+        # LoaderService(
+        #     config,
+        #     storage,
+        # ).run()
     elif args.post:
-        PostService(
-            config,
-            storage,
-            [
-                BlueSky(config),
-                WordPress(config),
-            ],
-        ).run()
+        logging.info("Sending one post to social media ...")
+        # PostService(
+        #     config,
+        #     storage,
+        #     [
+        #         BlueSky(config),
+        #         WordPress(config),
+        #     ],
+        # ).run()
