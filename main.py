@@ -4,9 +4,13 @@ import os
 import sys
 from logging.handlers import RotatingFileHandler
 
+from photos_to_bluesky.adaptors.social.blue_sky import BlueSky
+from photos_to_bluesky.adaptors.social.word_press import WordPress
 from photos_to_bluesky.adaptors.storage.json_storage import JsonStorage
 from photos_to_bluesky.model.config import Config
 from photos_to_bluesky.ports.istorage import IStorage
+from photos_to_bluesky.service.loader_service import LoaderService
+from photos_to_bluesky.service.post_service import PostService
 
 POSTS_FILENAME = "posts.jsonl"
 LOG_FILENAME = "photos_to_social.log"
@@ -40,7 +44,7 @@ def _load_args():
     )
     group = parser.add_mutually_exclusive_group(required=True)
     group.add_argument("-l", "--load", action="store_true", help="Load photos from home directory and prepare posts.")
-    group.add_argument("-p", "--post", action="store_true", help="Send next post to Social media.")
+    group.add_argument("-s", "--send", action="store_true", help="Send next post to Social media.")
 
     return parser.parse_args()
 
@@ -66,17 +70,17 @@ if __name__ == "__main__":
     storage: IStorage = JsonStorage(config)
     if args.load:
         logging.info(f"Loading new posts from {config.home_directory} ...")
-        # LoaderService(
-        #     config,
-        #     storage,
-        # ).run()
-    elif args.post:
+        LoaderService(
+            config,
+            storage,
+        ).run()
+    elif args.send:
         logging.info("Sending one post to social media ...")
-        # PostService(
-        #     config,
-        #     storage,
-        #     [
-        #         BlueSky(config),
-        #         WordPress(config),
-        #     ],
-        # ).run()
+        PostService(
+            config,
+            storage,
+            [
+                BlueSky(config),
+                WordPress(config),
+            ],
+        ).run()
