@@ -44,7 +44,7 @@ def _load_args():
     )
     group = parser.add_mutually_exclusive_group(required=True)
     group.add_argument("-l", "--load", action="store_true", help="Load photos from home directory and prepare posts.")
-    group.add_argument("-p", "--post", action="store_true", help="Send next post to Social media.")
+    group.add_argument("-s", "--send", action="store_true", help="Send next post to Social media.")
 
     return parser.parse_args()
 
@@ -74,7 +74,7 @@ if __name__ == "__main__":
             config,
             storage,
         ).run()
-    elif args.post:
+    elif args.send:
         logging.info("Sending one post to social media ...")
         PostService(
             config,
