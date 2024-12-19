@@ -24,7 +24,10 @@ def _check_directory(directory: str) -> str:
 
 
 def _load_config() -> Config:
-    home_directory = _check_directory(os.getenv("PHOTOS_TO_SOCIAL_HOME"))
+    _dir = os.getenv("PHOTOS_TO_SOCIAL_HOME")
+    if not _dir:
+        raise RuntimeError("Error: PHOTOS_TO_SOCIAL_HOME environment variable is not set.")
+    home_directory = _check_directory(_dir)
     return Config(
         home_directory=home_directory,
         posts_file=os.path.join(home_directory, POSTS_FILENAME),
@@ -46,7 +49,9 @@ def _load_args():
     group.add_argument("-l", "--load", action="store_true", help="Load photos from home directory and prepare posts.")
     group.add_argument("-s", "--send", action="store_true", help="Send next post to Social media.")
 
-    return parser.parse_args()
+    _args = parser.parse_args()
+    logging.debug(f"Args: load: {_args.load}, send: {_args.send}")
+    return _args
 
 
 def _init_logging(level, home_directory):
@@ -59,14 +64,14 @@ def _init_logging(level, home_directory):
             logging.StreamHandler(sys.stdout)
         ]
     )
+    logging.debug(f"Logging on file {_file}")
 
 
 if __name__ == "__main__":
-    logging.info("Setting up PhotosToSocial ...")
-    args = _load_args()
     config = _load_config()
     _init_logging(logging.INFO, config.home_directory)
-    logging.info(f"Loaded config: {config}")
+    args = _load_args()
+    logging.info(f"Starting PhotosToSocial ...")
     storage: IStorage = JsonStorage(config)
     if args.load:
         logging.info(f"Loading new posts from {config.home_directory} ...")
@@ -84,3 +89,4 @@ if __name__ == "__main__":
                 WordPress(config),
             ],
         ).run()
+
