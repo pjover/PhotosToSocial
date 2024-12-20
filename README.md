@@ -5,21 +5,21 @@ is to be able to post at least a photo every day without effort.
 
 The workflow is like this:
 
-1. Export the photos from lightroom or your favourite program into `PHOTOS_TO_SOCIAL_HOME` directory.
+1. Export the photos from lightroom or your favourite program into `PHOTOS_TO_SOCIAL_HOME` directory. Remove all metadata you don't want to expose before loading the photos into PhotosToSocial, I personally use the great Jeffrey Friedl's [Metadata Wrangler](https://regex.info/blog/lightroom-goodies/metadata-wrangler) Export Filter.
 2. Load (running `main.py --load`) loads photos from home directory and prepare posts.
     1. `PhotoLoader` will load new photos and read metadata. This process will load new photos, comparing with posts
-       already loaded ans stored into `POSTS_FILENAME` json file.
+       already loaded and stored into `POSTS_FILENAME` json file.
     2. `PostBuilder` creates post from photos
         - Metadata:
             - `Title` will be added to the post text. If multiple photos in the same job share the same `title`, then it
-              will merged in a single post with all photos.
+              will merge in a single post with all photos.
             - `Caption` will be added to the post text. If multiple photos are grouped in the same post, the `caption`
               field will be used for the post text, appending the caption of every photo to the post's text, and
               as `alt` text of the image (if it has content).
             - `Keywords` starting with `#` will be added to the post. If multiple photos are grouped in the same post,
               duplicated keywords are ignored.
         - The posts are stored into `POSTS_FILENAME` json file.
-3. Post (running `main.py --post`) sends next post to Social media. This option is intendet to be called by a daily cron
+3. Post (running `main.py --post`) sends next post to Social media. This option is intended to be called by a daily cron
    job.
     1. Reads next post to be published from `POSTS_FILENAME` json file.
     2. Send the post to social media, currently to BlueSky and WordPress (using Post by Email feature).
@@ -48,16 +48,33 @@ Set these environment variables to set up the script:
 
 Follow the instructions on [ExifTool installation page](https://exiftool.org/install.html).
 
+## Scheduled execution with cron
+
+1. Set the environment variables in `/etc/environment` file so are available for cron.
+2. Use [load.sh](load.sh) and [send.sh](send.sh) for easily set up the scheduled tasks.
+3. Run `crontab -e` to set up the cron expressions, for instance:
+```cronexp
+# Post every day
+0 7 * * * $HOME/PhotosToSocial/send.sh › $HOME/social/last_cron_send.log 2>&1
+# Load new photos every Sunday at 22:00
+0 22 * * 0 $HOME/PhotosToSocial/load.sh > $HOME/social/last_cron_load.log 2>&1
+```
+
+Photos to social
+env variables
+set on /etc/environment so they are
+set fo cron
+
 
 ## Cron
 
 1. Set the environment variables in `/etc/environment` file so are available for cron.
-2. Run `crontab -e` to setup the cron expressions, for instance:
+2. Run `crontab -e` to set up the cron expressions, for instance:
 ```
+# Load new photos every day at 06:00
+0 6 * * * /home/pere/PhotosToSocial/load.sh > /home/pere/social/last_cron_load.log 2>&1
 # Post every day
 0 7 * * * /home/pere/PhotosToSocial/send.sh › /home/pere/social/last_cron_send.log 2>&1
-# Load new photos every Sunday at 22:00
-0 22 * * 0 /home/pere/PhotosToSocial/load.sh > /home/pere/social/last_cron_load.log 2>&1
 ```
 
 Photos to social
