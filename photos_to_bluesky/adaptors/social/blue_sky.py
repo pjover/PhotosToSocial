@@ -35,7 +35,7 @@ class BlueSky(ISocialMedia):
             with open(path, 'rb') as f:
                 images.append(f.read())
 
-        text = f"{post.title}\n\n{post.text}"
+        text = f"{post.title}\n\n{post.text}\n\n"
         text_builder = client_utils.TextBuilder()
         text_builder.text(text)
 
