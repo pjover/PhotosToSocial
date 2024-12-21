@@ -51,14 +51,18 @@ Follow the instructions on [ExifTool installation page](https://exiftool.org/ins
 ## Scheduled execution with cron
 
 1. Set the environment variables in `/etc/environment` file so are available for cron.
-2. Use [load.sh](load.sh) and [send.sh](send.sh) for easily set up the scheduled tasks.
+2. Use [load.sh](load.sh) and [send.sh](send.sh) for easily set up the scheduled tasks. Set as executable scripts:
+    ```shell
+    chmod +x PhotosToSocial/load.sh
+    chmod +x PhotosToSocial/send.sh
+    ```
 3. Run `crontab -e` to set up the cron expressions, for instance:
-```cronexp
-# Post every day
-0 7 * * * $HOME/PhotosToSocial/send.sh › $HOME/social/last_cron_send.log 2>&1
-# Load new photos every Sunday at 22:00
-0 22 * * 0 $HOME/PhotosToSocial/load.sh > $HOME/social/last_cron_load.log 2>&1
-```
+    ```cronexp
+    # Post every day
+    0 7 * * * $HOME/PhotosToSocial/send.sh › $HOME/social/last_cron_send.log 2>&1
+    # Load new photos every Sunday at 22:00
+    0 22 * * 0 $HOME/PhotosToSocial/load.sh > $HOME/social/last_cron_load.log 2>&1
+    ```
 
 Photos to social
 env variables
@@ -73,7 +77,7 @@ set fo cron
 ```
 # Load new photos every day at 06:00
 0 6 * * * /home/pere/PhotosToSocial/load.sh > /home/pere/social/last_cron_load.log 2>&1
-# Post every day
+# Post every day at 07:00
 0 7 * * * /home/pere/PhotosToSocial/send.sh › /home/pere/social/last_cron_send.log 2>&1
 ```
 
