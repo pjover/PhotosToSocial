@@ -90,14 +90,13 @@ class PhotoLoader:
         else:
             raise RuntimeError(f"Error running command {command}: {result.stderr}")
 
-    @staticmethod
-    def _extract_tag(line: str, photo: Photo) -> Photo:
+    def _extract_tag(self, line: str, photo: Photo) -> Photo:
         for tag, field in tags_to_store.items():
             if not line.startswith(tag):
                 continue
             content = line.split(":")[1].strip()
             if field == "keywords":
-                photo.keywords = content.replace("#", "").split(", ")
+                photo.keywords = self._parse_keywords(content)
             elif field == "title":
                 photo.title = content
             elif field == "caption":
@@ -109,3 +108,9 @@ class PhotoLoader:
             elif field == "height":
                 photo.height = content
         return photo
+
+    @staticmethod
+    def _parse_keywords(content: str) -> List[str]:
+        _raw_keywords = content.split(", ")
+        _keywords = [keyword.replace("#", "") for keyword in _raw_keywords if keyword.startswith("#")]
+        return sorted(_keywords)
