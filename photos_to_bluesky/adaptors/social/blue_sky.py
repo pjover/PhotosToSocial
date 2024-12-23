@@ -35,10 +35,8 @@ class BlueSky(ISocialMedia):
             with open(path, 'rb') as f:
                 images.append(f.read())
 
-        text = f"{post.title}\n\n{post.text}\n\n"
         text_builder = client_utils.TextBuilder()
-        text_builder.text(text)
-
+        text_builder.text(self._text(post))
         for keyword in post.keywords:
             text_builder.tag(f"#{keyword} ", keyword)
 
@@ -48,6 +46,13 @@ class BlueSky(ISocialMedia):
             image_alts=image_alts,
             image_aspect_ratios=image_aspect_ratios,
         )
+
+    @staticmethod
+    def _text(post: Post) -> str:
+        text = f"{post.title}\n\n"
+        if post.text:
+            text += f"\n\n{post.text}\n\n"
+        return text
 
     @staticmethod
     def _aspect_ratio(height, width) -> AspectRatio:
