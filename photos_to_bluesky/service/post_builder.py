@@ -62,19 +62,19 @@ class PostBuilder:
             # Add image
             post.images.append(self._image(photo))
             # Merge keywords
-            post.keywords = self._unique_keywords(post.keywords, photo.keywords)
+            post.keywords = self._unique_items(post.keywords, photo.keywords)
             # Merge text
             if photo.caption:
-                text.append(photo.caption)
+                text = self._unique_items(text, [photo.caption])
 
         if text:
             post.text = ".\n".join(text)
         return post
 
     @staticmethod
-    def _unique_keywords(keywords_left: List[str], keywords_right: List[str]) -> List[str]:
-        unique_keywords = []
-        for keyword in keywords_left + keywords_right:
-            if keyword not in unique_keywords:
-                unique_keywords.append(keyword)
-        return unique_keywords
+    def _unique_items(items_left: List[str], items_right: List[str]) -> List[str]:
+        unique_items = []
+        for item in items_left + items_right:
+            if item not in unique_items:
+                unique_items.append(item)
+        return unique_items
