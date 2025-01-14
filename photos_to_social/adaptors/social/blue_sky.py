@@ -57,7 +57,7 @@ class BlueSky(ISocialMedia):
                     text += f"- {image.title}\n"
             text += "\n"
         else:
-            text += f"{post.title}\n\n"
+            text += f"{post.images[0].title}\n\n"
 
         if post.headline:
             text += f"{post.headline}\n\n"

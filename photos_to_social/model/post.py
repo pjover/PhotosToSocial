@@ -22,4 +22,4 @@ class Post(BaseModel):
     sent_on: str
 
     def __str__(self):
-        return f"{self.id}: {self.title}, {self.text}, {self.keywords}, {self.images}, {self.processed_on}, {self.sent_on}"
+        return f"{self.id}: {self.caption}, {self.headline}, {self.images}, {self.keywords}, {self.processed_on}, {self.sent_on}"

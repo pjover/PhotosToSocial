@@ -28,11 +28,7 @@ class WordPress(ISocialMedia):
     def publish_post(self, post: Post):
         message = MIMEMultipart()
 
-        if post.caption:
-            message['Subject'] = post.caption
-        else:
-            message['Subject'] = post.title
-
+        message['Subject'] = self.build_subject(post)
         message['From'] = self._gmail_account
         message['To'] = self._to
 
@@ -57,13 +53,23 @@ class WordPress(ISocialMedia):
             server.sendmail(self._gmail_account, self._to, message.as_string())
 
     @staticmethod
+    def build_subject(post: Post) -> str:
+        if post.caption:
+            return post.caption
+        else:
+            return post.images[0].title
+
+    @staticmethod
     def build_text(post: Post) -> str:
         text = ""
         if post.caption:
+            text += f"{post.caption}\n\n"
             for image in post.images:
                 if image.title:
                     text += f"- {image.title}\n"
             text += "\n"
+        else:
+            text += f"{post.images[0].title}\n\n"
 
         if post.headline:
             text += f"{post.headline}\n\n"

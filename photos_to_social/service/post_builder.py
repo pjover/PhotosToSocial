@@ -20,6 +20,8 @@ class PostBuilder:
         posts = []
         for title, grouped_photos in grouped_photos.items():
             if len(grouped_photos) == 1:
+                if not grouped_photos[0].title:
+                    raise ValueError(f"Photo {grouped_photos[0].id} has no title.")
                 posts.append(self._post_from_photo(grouped_photos[0]))
             else:
                 posts.append(self._merge(grouped_photos))
