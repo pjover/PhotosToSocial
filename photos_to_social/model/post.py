@@ -6,17 +6,17 @@ from pydantic import BaseModel
 class Image(BaseModel):
     """Class for keeping track of an image from a post"""
     file: str
-    alt: str
+    title: str
     width: int
     height: int
 
 
 class Post(BaseModel):
     """Class for keeping track of a post"""
-    id: int
+    id: str
     images: List[Image]
-    title: str
-    text: str
+    caption: str
+    headline: str
     keywords: List[str]
     processed_on: str
     sent_on: str

@@ -6,9 +6,9 @@ from email.mime.base import MIMEBase
 from email.mime.multipart import MIMEMultipart
 from email.mime.text import MIMEText
 
-from photos_to_bluesky.model.config import Config
-from photos_to_bluesky.model.post import Post
-from photos_to_bluesky.ports.isocialmedia import ISocialMedia
+from photos_to_social.model.config import Config
+from photos_to_social.model.post import Post
+from photos_to_social.ports.isocialmedia import ISocialMedia
 
 CATEGORY = "Foto"
 STATUS = "publish"
@@ -27,11 +27,17 @@ class WordPress(ISocialMedia):
 
     def publish_post(self, post: Post):
         message = MIMEMultipart()
-        message['Subject'] = post.title
+
+        if post.caption:
+            message['Subject'] = post.caption
+        else:
+            message['Subject'] = post.title
+
         message['From'] = self._gmail_account
         message['To'] = self._to
-        body = f"{post.text}\n[category {CATEGORY}]\n[tags {','.join(post.keywords)}]\n[status {STATUS}]"
-        html_part = MIMEText(body)
+
+        text = self.build_text(post)
+        html_part = MIMEText(text)
         message.attach(html_part)
 
         for image in post.images:
@@ -49,3 +55,19 @@ class WordPress(ISocialMedia):
         with smtplib.SMTP_SSL('smtp.gmail.com', 465) as server:
             server.login(self._gmail_account, self._gmail_app_password)
             server.sendmail(self._gmail_account, self._to, message.as_string())
+
+    @staticmethod
+    def build_text(post: Post) -> str:
+        text = ""
+        if post.caption:
+            for image in post.images:
+                if image.title:
+                    text += f"- {image.title}\n"
+            text += "\n"
+
+        if post.headline:
+            text += f"{post.headline}\n\n"
+
+        keywords = ','.join(post.keywords)
+
+        return f"{text}\n[category {CATEGORY}]\n[tags {keywords}]\n[status {STATUS}]"

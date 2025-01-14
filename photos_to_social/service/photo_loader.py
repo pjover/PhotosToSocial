@@ -4,13 +4,15 @@ import subprocess
 from datetime import datetime
 from typing import List
 
-from photos_to_bluesky.model.photo import Photo
-from photos_to_bluesky.model.post import Post
+from photos_to_social.model.photo import Photo
+from photos_to_social.model.post import Post
 
 tags_to_store = {
+    "Headline ": "headline",
     "Title": "title",
     "Description": "caption",
     "Subject ": "keywords",
+    "State ": "order",
     "Image Width": "width",
     "Image Height": "height",
 }
@@ -30,7 +32,7 @@ class PhotoLoader:
         index = 1
         for file in sorted(new_files):
             _id = self._build_id(job_id, index)
-            photos.append(self._read(_id, file))
+            photos.append(self._read(job_id, _id, file))
             index += 1
         if photos:
             logging.info(f"Found {len(photos)} new photos.")
@@ -71,14 +73,14 @@ class PhotoLoader:
                 return False
         return True
 
-    def _read(self, photo_id: int, file: str) -> Photo:
+    def _read(self, job_id: int, photo_id: int, file: str) -> Photo:
         photo = Photo(id=photo_id, file=file)
         xmp_lines = self._command(["exiftool", "-XMP:all", os.path.join(self._home_directory, file)])
         file_lines = self._command(["exiftool", "-File:all", os.path.join(self._home_directory, file)])
         for line in xmp_lines + file_lines:
-            self._extract_tag(line, photo)
-        if not photo.title:
-            raise RuntimeError(f"Title not found for photo {photo.file}")
+            self._extract_tag(job_id, line, photo)
+        if not photo.title and not photo.caption:
+            raise RuntimeError(f"Photo must have a caption or a title: {photo.file}")
         logging.info(f"Read photo: {photo}")
         return photo
 
@@ -90,13 +92,17 @@ class PhotoLoader:
         else:
             raise RuntimeError(f"Error running command {command}: {result.stderr}")
 
-    def _extract_tag(self, line: str, photo: Photo) -> Photo:
+    def _extract_tag(self, job_id: int, line: str, photo: Photo) -> Photo:
         for tag, field in tags_to_store.items():
             if not line.startswith(tag):
                 continue
             content = line.split(":")[1].strip()
             if field == "keywords":
                 photo.keywords = self._parse_keywords(content)
+            elif field == "headline":
+                photo.headline = content
+            elif field == "order":
+                photo.order = f"{job_id}-{content}"
             elif field == "title":
                 photo.title = content
             elif field == "caption":

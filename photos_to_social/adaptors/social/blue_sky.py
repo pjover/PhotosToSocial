@@ -5,9 +5,9 @@ from math import gcd
 from atproto import Client, client_utils
 from atproto_client.models.app.bsky.embed.defs import AspectRatio
 
-from photos_to_bluesky.model.config import Config
-from photos_to_bluesky.model.post import Post
-from photos_to_bluesky.ports.isocialmedia import ISocialMedia
+from photos_to_social.model.config import Config
+from photos_to_social.model.post import Post
+from photos_to_social.ports.isocialmedia import ISocialMedia
 
 
 class BlueSky(ISocialMedia):
@@ -27,7 +27,7 @@ class BlueSky(ISocialMedia):
     def publish_post(self, post: Post):
         logging.info(f"Publishing post `{post.id}` to BlueSky ...")
         paths = [os.path.join(self._home_directory, img.file) for img in post.images]
-        image_alts = [img.alt for img in post.images]
+        image_alts = [img.title for img in post.images]
         image_aspect_ratios = [self._aspect_ratio(height=img.height, width=img.width) for img in post.images]
 
         images = []
@@ -36,7 +36,7 @@ class BlueSky(ISocialMedia):
                 images.append(f.read())
 
         text_builder = client_utils.TextBuilder()
-        text_builder.text(self._text(post))
+        text_builder.text(self.build_text(post))
         for keyword in post.keywords:
             text_builder.tag(f"#{keyword} ", keyword)
 
@@ -48,10 +48,20 @@ class BlueSky(ISocialMedia):
         )
 
     @staticmethod
-    def _text(post: Post) -> str:
-        text = f"{post.title}\n\n"
-        if post.text:
-            text += f"\n\n{post.text}\n\n"
+    def build_text(post: Post) -> str:
+        text = ""
+        if post.caption:
+            text += f"{post.caption}\n\n"
+            for image in post.images:
+                if image.title:
+                    text += f"- {image.title}\n"
+            text += "\n"
+        else:
+            text += f"{post.title}\n\n"
+
+        if post.headline:
+            text += f"{post.headline}\n\n"
+
         return text
 
     @staticmethod

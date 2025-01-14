@@ -2,9 +2,9 @@ import logging
 import os
 from typing import List, Optional
 
-from photos_to_bluesky.model.config import Config
-from photos_to_bluesky.model.post import Post
-from photos_to_bluesky.ports.istorage import IStorage
+from photos_to_social.model.config import Config
+from photos_to_social.model.post import Post
+from photos_to_social.ports.istorage import IStorage
 
 
 class JsonStorage(IStorage):

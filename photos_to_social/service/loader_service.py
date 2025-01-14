@@ -1,9 +1,9 @@
 import logging
 
-from photos_to_bluesky.model.config import Config
-from photos_to_bluesky.ports.istorage import IStorage
-from photos_to_bluesky.service.photo_loader import PhotoLoader
-from photos_to_bluesky.service.post_builder import PostBuilder
+from photos_to_social.model.config import Config
+from photos_to_social.ports.istorage import IStorage
+from photos_to_social.service.photo_loader import PhotoLoader
+from photos_to_social.service.post_builder import PostBuilder
 
 xmp_tags_to_store = {
     "Title": "title",
