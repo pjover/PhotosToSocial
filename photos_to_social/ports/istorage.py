@@ -1,6 +1,6 @@
 from typing import List, Protocol, Optional
 
-from photos_to_bluesky.model.post import Post
+from photos_to_social.model.post import Post
 
 
 class IStorage(Protocol):

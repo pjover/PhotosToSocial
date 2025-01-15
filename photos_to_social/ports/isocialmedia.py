@@ -1,6 +1,6 @@
 from typing import Protocol
 
-from photos_to_bluesky.model.post import Post
+from photos_to_social.model.post import Post
 
 
 class ISocialMedia(Protocol):

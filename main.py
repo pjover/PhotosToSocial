@@ -4,13 +4,13 @@ import os
 import sys
 from logging.handlers import RotatingFileHandler
 
-from photos_to_bluesky.adaptors.social.blue_sky import BlueSky
-from photos_to_bluesky.adaptors.social.word_press import WordPress
-from photos_to_bluesky.adaptors.storage.json_storage import JsonStorage
-from photos_to_bluesky.model.config import Config
-from photos_to_bluesky.ports.istorage import IStorage
-from photos_to_bluesky.service.loader_service import LoaderService
-from photos_to_bluesky.service.post_service import PostService
+from photos_to_social.adaptors.social.blue_sky import BlueSky
+from photos_to_social.adaptors.social.word_press import WordPress
+from photos_to_social.adaptors.storage.json_storage import JsonStorage
+from photos_to_social.model.config import Config
+from photos_to_social.ports.istorage import IStorage
+from photos_to_social.service.loader_service import LoaderService
+from photos_to_social.service.post_service import PostService
 
 POSTS_FILENAME = "posts.jsonl"
 LOG_FILENAME = "photos_to_social.log"

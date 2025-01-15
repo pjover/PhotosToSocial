@@ -2,9 +2,9 @@ import logging
 import typing
 from datetime import datetime
 
-from photos_to_bluesky.model.config import Config
-from photos_to_bluesky.ports.isocialmedia import ISocialMedia
-from photos_to_bluesky.ports.istorage import IStorage
+from photos_to_social.model.config import Config
+from photos_to_social.ports.isocialmedia import ISocialMedia
+from photos_to_social.ports.istorage import IStorage
 
 
 class PostService:

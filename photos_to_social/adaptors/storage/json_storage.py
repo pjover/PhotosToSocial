@@ -1,10 +1,11 @@
 import logging
 import os
+from datetime import datetime, timedelta
 from typing import List, Optional
 
-from photos_to_bluesky.model.config import Config
-from photos_to_bluesky.model.post import Post
-from photos_to_bluesky.ports.istorage import IStorage
+from photos_to_social.model.config import Config
+from photos_to_social.model.post import Post
+from photos_to_social.ports.istorage import IStorage
 
 
 class JsonStorage(IStorage):
@@ -36,6 +37,8 @@ class JsonStorage(IStorage):
         not_sent_posts = [post for post in all_posts if not post.sent_on]
         if not not_sent_posts:
             return None
+        date_until = datetime.today() + timedelta(days=len(not_sent_posts))
+        logging.info(f"There are {len(not_sent_posts)} posts to publish, until {date_until}.")
         sorted_not_sent_posts = sorted(not_sent_posts, key=lambda post: post.id)
         return sorted_not_sent_posts[0]
 
