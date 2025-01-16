@@ -64,6 +64,7 @@ class WordPress(ISocialMedia):
         text = ""
         if post.caption:
             text += f"{post.caption}\n\n"
+        if len(post.images) > 1:
             for image in post.images:
                 if image.title:
                     text += f"- {image.title}\n"
