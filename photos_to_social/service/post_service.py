@@ -3,6 +3,7 @@ import typing
 from datetime import datetime
 
 from photos_to_social.model.config import Config
+from photos_to_social.model.post import Post
 from photos_to_social.ports.isocialmedia import ISocialMedia
 from photos_to_social.ports.istorage import IStorage
 
@@ -20,6 +21,13 @@ class PostService:
             return
         logging.info(f"Publishing post: {next_post}")
         for social_media in self._social_media:
-            social_media.publish_post(next_post)
-        next_post.sent_on = datetime.now().isoformat()
-        self._storage.update(next_post)
+            self.post(social_media, next_post)
+
+    def post(self, social_media: ISocialMedia, post: Post):
+        try:
+            social_media.publish_post(post)
+            post.sent_on[social_media.name()] = datetime.now().isoformat()
+            self._storage.update(post)
+            logging.debug(f"Published post `{post.id}` to {social_media.name()}")
+        except Exception as e:
+            logging.error(f"Failed to publish post `{post.id}` to {social_media.name()}: {e}")

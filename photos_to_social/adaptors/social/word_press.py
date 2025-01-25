@@ -1,3 +1,4 @@
+import logging
 import os
 import os.path
 import smtplib
@@ -25,9 +26,13 @@ class WordPress(ISocialMedia):
         self._gmail_app_password = config.gmail_app_password
         self._to = config.word_press_post_by_email_to
 
-    def publish_post(self, post: Post):
-        message = MIMEMultipart()
+    def name(self) -> str:
+        return "WordPress"
 
+    def publish_post(self, post: Post):
+        logging.info(f"Publishing post `{post.id}` to WordPress ...")
+
+        message = MIMEMultipart()
         message['Subject'] = self.build_subject(post)
         message['From'] = self._gmail_account
         message['To'] = self._to
@@ -51,6 +56,8 @@ class WordPress(ISocialMedia):
         with smtplib.SMTP_SSL('smtp.gmail.com', 465) as server:
             server.login(self._gmail_account, self._gmail_app_password)
             server.sendmail(self._gmail_account, self._to, message.as_string())
+
+        logging.info(f"Published post `{post.id}` to WordPress")
 
     @staticmethod
     def build_subject(post: Post) -> str:
