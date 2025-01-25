@@ -11,7 +11,10 @@ _post_with_grouped_photos = Post(
     headline="Headline",
     keywords=["keyword1", "keyword2"],
     processed_on="2021-01-01T00:00:00",
-    sent_on="2021-01-01T00:00:00",
+    sent_on={
+        "BlueSky": "2021-01-01T00:00:00",
+        "WordPress": "2021-01-01T00:00:00",
+    },
 )
 
 _post_with_single_photo = Post(
@@ -23,7 +26,10 @@ _post_with_single_photo = Post(
     headline="Headline",
     keywords=["keyword1", "keyword2"],
     processed_on="2021-01-01T00:00:00",
-    sent_on="2021-01-01T00:00:00",
+    sent_on={
+        "BlueSky": "2021-01-01T00:00:00",
+        "WordPress": "2021-01-01T00:00:00",
+    },
 )
 
 _post_with_single_photo_w_caption_wo_headline = Post(
@@ -35,7 +41,10 @@ _post_with_single_photo_w_caption_wo_headline = Post(
     headline="",
     keywords=["keyword1", "keyword2"],
     processed_on="2021-01-01T00:00:00",
-    sent_on="2021-01-01T00:00:00",
+    sent_on={
+        "BlueSky": "2021-01-01T00:00:00",
+        "WordPress": "2021-01-01T00:00:00",
+    },
 )
 
 _post_with_single_photo_w_caption_and_headline = Post(
@@ -47,7 +56,10 @@ _post_with_single_photo_w_caption_and_headline = Post(
     headline="Headline",
     keywords=["keyword1", "keyword2"],
     processed_on="2021-01-01T00:00:00",
-    sent_on="2021-01-01T00:00:00",
+    sent_on={
+        "BlueSky": "2021-01-01T00:00:00",
+        "WordPress": "2021-01-01T00:00:00",
+    },
 )
 
 _post_with_grouped_photos_wo_headline = Post(
@@ -60,7 +72,10 @@ _post_with_grouped_photos_wo_headline = Post(
     headline="",
     keywords=["keyword1", "keyword2"],
     processed_on="2021-01-01T00:00:00",
-    sent_on="2021-01-01T00:00:00",
+    sent_on={
+        "BlueSky": "2021-01-01T00:00:00",
+        "WordPress": "2021-01-01T00:00:00",
+    },
 )
 
 _post_with_single_photo_wo_headline = Post(
@@ -72,7 +87,10 @@ _post_with_single_photo_wo_headline = Post(
     headline="",
     keywords=["keyword1", "keyword2"],
     processed_on="2021-01-01T00:00:00",
-    sent_on="2021-01-01T00:00:00",
+    sent_on={
+        "BlueSky": "2021-01-01T00:00:00",
+        "WordPress": "2021-01-01T00:00:00",
+    },
 )
 
 

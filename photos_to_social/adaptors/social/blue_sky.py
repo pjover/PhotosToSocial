@@ -24,6 +24,9 @@ class BlueSky(ISocialMedia):
         except Exception as e:
             raise RuntimeError(f"Failed to login to BlueSky: {e}")
 
+    def name(self) -> str:
+        return "BlueSky"
+
     def publish_post(self, post: Post):
         logging.info(f"Publishing post `{post.id}` to BlueSky ...")
         paths = [os.path.join(self._home_directory, img.file) for img in post.images]
@@ -46,6 +49,7 @@ class BlueSky(ISocialMedia):
             image_alts=image_alts,
             image_aspect_ratios=image_aspect_ratios,
         )
+        logging.info(f"Published post `{post.id}` to BlueSky")
 
     @staticmethod
     def build_text(post: Post) -> str:

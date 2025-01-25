@@ -1,4 +1,4 @@
-from typing import List
+from typing import List, Dict
 
 from pydantic import BaseModel
 
@@ -19,7 +19,7 @@ class Post(BaseModel):
     headline: str
     keywords: List[str]
     processed_on: str
-    sent_on: str
+    sent_on: Dict[str, str] = {}
 
     def __str__(self):
         return f"{self.id}: {self.caption}, {self.headline}, {self.images}, {self.keywords}, {self.processed_on}, {self.sent_on}"
