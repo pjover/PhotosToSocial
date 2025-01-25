@@ -48,7 +48,7 @@ class PostBuilder:
             headline=photo.headline,
             keywords=photo.keywords,
             processed_on=datetime.now().isoformat(),
-            sent_on=""
+            sent_on={}
         )
 
     @staticmethod
