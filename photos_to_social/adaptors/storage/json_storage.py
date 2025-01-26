@@ -5,10 +5,10 @@ from typing import List, Optional
 
 from photos_to_social.model.config import Config
 from photos_to_social.model.post import Post
-from photos_to_social.ports.istorage import IStorage
+from photos_to_social.ports.storage import Storage
 
 
-class JsonStorage(IStorage):
+class JsonStorage(Storage):
     def __init__(self, config: Config):
         self._file_path = self._check_file(config.posts_file)
 

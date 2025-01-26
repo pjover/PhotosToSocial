@@ -9,7 +9,7 @@ from email.mime.text import MIMEText
 
 from photos_to_social.model.config import Config
 from photos_to_social.model.post import Post
-from photos_to_social.ports.isocialmedia import ISocialMedia
+from photos_to_social.ports.social_media import SocialMedia
 
 CATEGORY = "Foto"
 STATUS = "publish"
@@ -19,7 +19,7 @@ STATUS = "publish"
 # Sign in with app passwords: https://support.google.com/mail/answer/185833?hl=en
 # WordPress Post by Email: https://wordpress.com/support/post-by-email/
 
-class WordPress(ISocialMedia):
+class WordPress(SocialMedia):
     def __init__(self, config: Config):
         self._home_directory = config.home_directory
         self._gmail_account = config.gmail_user_email

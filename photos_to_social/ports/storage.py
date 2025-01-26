@@ -3,7 +3,7 @@ from typing import List, Protocol, Optional
 from photos_to_social.model.post import Post
 
 
-class IStorage(Protocol):
+class Storage(Protocol):
     def read_all_posts(self) -> List[Post]:
         """Load all stored posts and return them as a list."""
         ...

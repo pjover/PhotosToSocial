@@ -8,7 +8,7 @@ from photos_to_social.adaptors.social.blue_sky import BlueSky
 from photos_to_social.adaptors.social.word_press import WordPress
 from photos_to_social.adaptors.storage.json_storage import JsonStorage
 from photos_to_social.model.config import Config
-from photos_to_social.ports.istorage import IStorage
+from photos_to_social.ports.storage import Storage
 from photos_to_social.service.loader_service import LoaderService
 from photos_to_social.service.post_service import PostService
 
@@ -72,7 +72,7 @@ if __name__ == "__main__":
     _init_logging(logging.INFO, config.home_directory)
     args = _load_args()
     logging.info(f"Starting PhotosToSocial ...")
-    storage: IStorage = JsonStorage(config)
+    storage: Storage = JsonStorage(config)
     if args.load:
         logging.info(f"Loading new posts from {config.home_directory} ...")
         LoaderService(

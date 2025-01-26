@@ -4,12 +4,12 @@ from datetime import datetime
 
 from photos_to_social.model.config import Config
 from photos_to_social.model.post import Post
-from photos_to_social.ports.isocialmedia import ISocialMedia
-from photos_to_social.ports.istorage import IStorage
+from photos_to_social.ports.social_media import SocialMedia
+from photos_to_social.ports.storage import Storage
 
 
 class PostService:
-    def __init__(self, config: Config, storage: IStorage, social_media: typing.List[ISocialMedia]):
+    def __init__(self, config: Config, storage: Storage, social_media: typing.List[SocialMedia]):
         self._home_directory = config.home_directory
         self._storage = storage
         self._social_media = social_media
@@ -23,7 +23,7 @@ class PostService:
         for social_media in self._social_media:
             self.post(social_media, next_post)
 
-    def post(self, social_media: ISocialMedia, post: Post):
+    def post(self, social_media: SocialMedia, post: Post):
         try:
             social_media.publish_post(post)
             post.sent_on[social_media.name()] = datetime.now().isoformat()

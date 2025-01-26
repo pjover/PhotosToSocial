@@ -6,8 +6,8 @@ import pytest
 
 from photos_to_social.model.config import Config
 from photos_to_social.model.post import Post, Image
-from photos_to_social.ports.isocialmedia import ISocialMedia
-from photos_to_social.ports.istorage import IStorage
+from photos_to_social.ports.social_media import SocialMedia
+from photos_to_social.ports.storage import Storage
 from photos_to_social.service.post_service import PostService
 
 
@@ -40,29 +40,29 @@ def config() -> Config:
 
 
 @pytest.fixture
-def storage(post) -> IStorage:
-    mock = Mock(speck=IStorage)
+def storage(post) -> Storage:
+    mock = Mock(speck=Storage)
     mock.read_next_post = MagicMock(return_value=post)
     return mock
 
 
 @pytest.fixture
-def ok_social_media() -> ISocialMedia:
-    mock = Mock(speck=ISocialMedia)
+def ok_social_media() -> SocialMedia:
+    mock = Mock(speck=SocialMedia)
     mock.name = MagicMock(return_value="ok_social_media")
     return mock
 
 
 @pytest.fixture
-def ok2_social_media() -> ISocialMedia:
-    mock = Mock(speck=ISocialMedia)
+def ok2_social_media() -> SocialMedia:
+    mock = Mock(speck=SocialMedia)
     mock.name = MagicMock(return_value="ok2_social_media")
     return mock
 
 
 @pytest.fixture
-def ko_social_media() -> ISocialMedia:
-    mock = Mock(speck=ISocialMedia)
+def ko_social_media() -> SocialMedia:
+    mock = Mock(speck=SocialMedia)
     mock.name = MagicMock(return_value="ko_social_media")
     mock.publish_post = MagicMock(side_effect=Exception("Failed to publish post"))
     return mock

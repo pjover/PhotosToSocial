@@ -7,10 +7,10 @@ from atproto_client.models.app.bsky.embed.defs import AspectRatio
 
 from photos_to_social.model.config import Config
 from photos_to_social.model.post import Post
-from photos_to_social.ports.isocialmedia import ISocialMedia
+from photos_to_social.ports.social_media import SocialMedia
 
 
-class BlueSky(ISocialMedia):
+class BlueSky(SocialMedia):
     def __init__(self, config: Config):
         self._home_directory = config.home_directory
         self._client = self._client(config.blue_sky_username, config.blue_sky_password)
