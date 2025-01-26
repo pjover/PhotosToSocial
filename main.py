@@ -82,6 +82,7 @@ if __name__ == "__main__":
         LoaderService(
             config,
             storage,
+            error_notifier
         ).run()
     elif args.send:
         logging.info("Sending one post to social media ...")
