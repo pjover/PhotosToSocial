@@ -4,6 +4,7 @@ import os
 import sys
 from logging.handlers import RotatingFileHandler
 
+from photos_to_social.adaptors.error_notifier.email import EmailErrorNotifier
 from photos_to_social.adaptors.social.blue_sky import BlueSky
 from photos_to_social.adaptors.social.word_press import WordPress
 from photos_to_social.adaptors.storage.json_storage import JsonStorage
@@ -33,8 +34,10 @@ def _load_config() -> Config:
         posts_file=os.path.join(home_directory, POSTS_FILENAME),
         blue_sky_username=os.getenv("BLUE_SKY_USERNAME"),
         blue_sky_password=os.getenv("BLUE_SKY_PASSWORD"),
-        gmail_user_email=os.getenv("GMAIL_USER_EMAIL"),
-        gmail_app_password=os.getenv("GMAIL_APP_PASSWORD"),
+        email_user_email=os.getenv("GMAIL_USER_EMAIL"),
+        email_app_password=os.getenv("GMAIL_APP_PASSWORD"),
+        email_smtp_server="smtp.gmail.com",
+        email_smtp_port=465,
         word_press_post_by_email_to=os.getenv("WORD_PRESS_POST_BY_EMAIL_TO"),
     )
 
@@ -73,6 +76,7 @@ if __name__ == "__main__":
     args = _load_args()
     logging.info(f"Starting PhotosToSocial ...")
     storage: Storage = JsonStorage(config)
+    error_notifier = EmailErrorNotifier(config)
     if args.load:
         logging.info(f"Loading new posts from {config.home_directory} ...")
         LoaderService(
@@ -84,6 +88,7 @@ if __name__ == "__main__":
         PostService(
             config,
             storage,
+            error_notifier,
             [
                 BlueSky(config),
                 WordPress(config),
