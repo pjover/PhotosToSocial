@@ -7,22 +7,25 @@ from atproto_client.models.app.bsky.embed.defs import AspectRatio
 
 from photos_to_social.model.config import Config
 from photos_to_social.model.post import Post
-from photos_to_social.ports.isocialmedia import ISocialMedia
+from photos_to_social.ports.error_notifier import ErrorNotifier
+from photos_to_social.ports.social_media import SocialMedia
 
 
-class BlueSky(ISocialMedia):
-    def __init__(self, config: Config):
+class BlueSky(SocialMedia):
+    def __init__(self, config: Config, error_notifier: ErrorNotifier):
         self._home_directory = config.home_directory
         self._client = self._client(config.blue_sky_username, config.blue_sky_password)
+        self._error_notifier = error_notifier
 
-    @staticmethod
-    def _client(username: str, password: str):
+    def _client(self, username: str, password: str):
         try:
             _client = Client()
             _client.login(username, password)
             return _client
         except Exception as e:
-            raise RuntimeError(f"Failed to login to BlueSky: {e}")
+            msg = f"Failed to login to BlueSky: {e}"
+            self._error_notifier.notify(msg, str(e))
+            raise RuntimeError(f"{msg}: {e}")
 
     def name(self) -> str:
         return "BlueSky"

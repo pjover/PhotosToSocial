@@ -9,7 +9,7 @@ from email.mime.text import MIMEText
 
 from photos_to_social.model.config import Config
 from photos_to_social.model.post import Post
-from photos_to_social.ports.isocialmedia import ISocialMedia
+from photos_to_social.ports.social_media import SocialMedia
 
 CATEGORY = "Foto"
 STATUS = "publish"
@@ -19,11 +19,13 @@ STATUS = "publish"
 # Sign in with app passwords: https://support.google.com/mail/answer/185833?hl=en
 # WordPress Post by Email: https://wordpress.com/support/post-by-email/
 
-class WordPress(ISocialMedia):
+class WordPress(SocialMedia):
     def __init__(self, config: Config):
         self._home_directory = config.home_directory
-        self._gmail_account = config.gmail_user_email
-        self._gmail_app_password = config.gmail_app_password
+        self._email_account = config.email_user_email
+        self._email_app_password = config.email_app_password
+        self._email_smtp_server = config.email_smtp_server
+        self._email_smtp_port = config.email_smtp_port
         self._to = config.word_press_post_by_email_to
 
     def name(self) -> str:
@@ -34,7 +36,7 @@ class WordPress(ISocialMedia):
 
         message = MIMEMultipart()
         message['Subject'] = self.build_subject(post)
-        message['From'] = self._gmail_account
+        message['From'] = self._email_account
         message['To'] = self._to
 
         text = self.build_text(post)
@@ -53,9 +55,9 @@ class WordPress(ISocialMedia):
                 )
                 message.attach(part)
 
-        with smtplib.SMTP_SSL('smtp.gmail.com', 465) as server:
-            server.login(self._gmail_account, self._gmail_app_password)
-            server.sendmail(self._gmail_account, self._to, message.as_string())
+        with smtplib.SMTP_SSL(self._email_smtp_server, self._email_smtp_port) as server:
+            server.login(self._email_account, self._email_app_password)
+            server.sendmail(self._email_account, self._to, message.as_string())
 
         logging.info(f"Published post `{post.id}` to WordPress")
 

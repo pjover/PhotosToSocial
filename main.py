@@ -4,11 +4,12 @@ import os
 import sys
 from logging.handlers import RotatingFileHandler
 
+from photos_to_social.adaptors.error_notifier.email import EmailErrorNotifier
 from photos_to_social.adaptors.social.blue_sky import BlueSky
 from photos_to_social.adaptors.social.word_press import WordPress
 from photos_to_social.adaptors.storage.json_storage import JsonStorage
 from photos_to_social.model.config import Config
-from photos_to_social.ports.istorage import IStorage
+from photos_to_social.ports.storage import Storage
 from photos_to_social.service.loader_service import LoaderService
 from photos_to_social.service.post_service import PostService
 
@@ -33,8 +34,10 @@ def _load_config() -> Config:
         posts_file=os.path.join(home_directory, POSTS_FILENAME),
         blue_sky_username=os.getenv("BLUE_SKY_USERNAME"),
         blue_sky_password=os.getenv("BLUE_SKY_PASSWORD"),
-        gmail_user_email=os.getenv("GMAIL_USER_EMAIL"),
-        gmail_app_password=os.getenv("GMAIL_APP_PASSWORD"),
+        email_user_email=os.getenv("GMAIL_USER_EMAIL"),
+        email_app_password=os.getenv("GMAIL_APP_PASSWORD"),
+        email_smtp_server="smtp.gmail.com",
+        email_smtp_port=465,
         word_press_post_by_email_to=os.getenv("WORD_PRESS_POST_BY_EMAIL_TO"),
     )
 
@@ -72,20 +75,23 @@ if __name__ == "__main__":
     _init_logging(logging.INFO, config.home_directory)
     args = _load_args()
     logging.info(f"Starting PhotosToSocial ...")
-    storage: IStorage = JsonStorage(config)
+    storage: Storage = JsonStorage(config)
+    error_notifier = EmailErrorNotifier(config)
     if args.load:
         logging.info(f"Loading new posts from {config.home_directory} ...")
         LoaderService(
             config,
             storage,
+            error_notifier
         ).run()
     elif args.send:
         logging.info("Sending one post to social media ...")
         PostService(
             config,
             storage,
+            error_notifier,
             [
-                BlueSky(config),
+                BlueSky(config, error_notifier),
                 WordPress(config),
             ],
         ).run()

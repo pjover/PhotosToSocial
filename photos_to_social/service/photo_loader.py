@@ -6,6 +6,7 @@ from typing import List
 
 from photos_to_social.model.photo import Photo
 from photos_to_social.model.post import Post
+from photos_to_social.ports.error_notifier import ErrorNotifier
 
 tags_to_store = {
     "Headline ": "headline",
@@ -21,8 +22,9 @@ MAX_JOB_SIZE = 10 ** 3
 
 
 class PhotoLoader:
-    def __init__(self, home_directory: str):
+    def __init__(self, home_directory: str, error_notifier: ErrorNotifier):
         self._home_directory = home_directory
+        self._error_notifier = error_notifier
 
     def read_new_photos(self, stored_posts: List[Post]) -> List[Photo]:
         job_id = self._generate_job_id()
@@ -62,7 +64,9 @@ class PhotoLoader:
     def _new_files(self, files: List[str], stored_posts: List[Post]) -> List[str]:
         new_files = [file for file in files if self._is_new_file(file, stored_posts)]
         if len(new_files) >= MAX_JOB_SIZE:
-            raise RuntimeError(f"Too many new files ({len(new_files)}) in job, max is {MAX_JOB_SIZE}")
+            msg = f"Too many new files ({len(new_files)}) in job, max is {MAX_JOB_SIZE}"
+            self._error_notifier.notify("Too many new files", msg)
+            raise RuntimeError(msg)
         return new_files
 
     @staticmethod
@@ -80,17 +84,20 @@ class PhotoLoader:
         for line in xmp_lines + file_lines:
             self._extract_tag(job_id, line, photo)
         if not photo.title and not photo.caption:
-            raise RuntimeError(f"Photo must have a caption or a title: {photo.file}")
+            msg = f"Photo must have a caption or a title: {photo.file}"
+            self._error_notifier.notify("Photo without caption or title", msg)
+            raise RuntimeError(msg)
         logging.info(f"Read photo: {photo}")
         return photo
 
-    @staticmethod
-    def _command(command) -> List[str]:
+    def _command(self, command) -> List[str]:
         result = subprocess.run(command, stdout=subprocess.PIPE, stderr=subprocess.PIPE, text=True)
         if result.returncode == 0:
             return result.stdout.splitlines()
         else:
-            raise RuntimeError(f"Error running command {command}: {result.stderr}")
+            msg = f"Error running command {command}: {result.stderr}"
+            self._error_notifier.notify("Error running command", msg)
+            raise RuntimeError(msg)
 
     def _extract_tag(self, job_id: int, line: str, photo: Photo) -> Photo:
         for tag, field in tags_to_store.items():
