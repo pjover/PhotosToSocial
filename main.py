@@ -91,7 +91,7 @@ if __name__ == "__main__":
             storage,
             error_notifier,
             [
-                BlueSky(config),
+                BlueSky(config, error_notifier),
                 WordPress(config),
             ],
         ).run()
